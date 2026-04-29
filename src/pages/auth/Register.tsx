@@ -72,7 +72,7 @@ export default function Register() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="username">Používateľské meno</Label>
-            <Input id="username" required value={form.username} onChange={update("username")} placeholder="napr. lucia_22" />
+            <Input id="username" required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })} placeholder="napr. lucia_22" autoCapitalize="none" autoCorrect="off" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
