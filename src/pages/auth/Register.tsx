@@ -10,7 +10,7 @@ import { z } from "zod";
 
 const schema = z.object({
   email: z.string().trim().email("Neplatný email").max(255),
-  username: z.string().trim().min(3, "Min. 3 znaky").max(20, "Max. 20 znakov").regex(/^[a-z0-9_]+$/, "Iba a-z, 0-9, _"),
+  username: z.string().trim().toLowerCase().min(3, "Min. 3 znaky").max(20, "Max. 20 znakov").regex(/^[a-z0-9_]+$/, "Iba a-z, 0-9, _"),
   full_name: z.string().trim().min(1, "Zadaj meno").max(60),
   password: z.string().min(8, "Min. 8 znakov").max(72),
 });
