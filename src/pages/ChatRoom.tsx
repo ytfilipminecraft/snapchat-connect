@@ -150,10 +150,10 @@ export default function ChatRoom() {
       toast.error(upErr.message);
       return;
     }
-    const url = supabase.storage.from("messages").getPublicUrl(path).data.publicUrl;
+    // Store storage path; signed URLs are generated on render
     const { data } = await supabase
       .from("messages")
-      .insert({ conversation_id: id, sender_id: user.id, image_url: url })
+      .insert({ conversation_id: id, sender_id: user.id, image_url: path })
       .select("*")
       .single();
     if (data) setMsgs((p) => (p.some((x) => x.id === (data as any).id) ? p : [...p, data as Msg]));
@@ -208,7 +208,7 @@ export default function ChatRoom() {
                   )}
                 >
                   {m.image_url ? (
-                    <img src={m.image_url} alt="" className="rounded-xl max-w-[240px]" />
+                    <SignedImage path={m.image_url} />
                   ) : (
                     m.content
                   )}
@@ -253,4 +253,27 @@ export default function ChatRoom() {
       </div>
     </div>
   );
+}
+
+function SignedImage({ path }: { path: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    // Backwards compat: if a full URL was stored before, use it directly
+    if (/^https?:\/\//i.test(path)) {
+      setUrl(path);
+      return;
+    }
+    supabase.storage
+      .from("messages")
+      .createSignedUrl(path, 60 * 60)
+      .then(({ data }) => {
+        if (!cancelled && data?.signedUrl) setUrl(data.signedUrl);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+  if (!url) return <div className="w-[240px] h-[160px] bg-muted animate-pulse rounded-xl" />;
+  return <img src={url} alt="" className="rounded-xl max-w-[240px]" />;
 }
