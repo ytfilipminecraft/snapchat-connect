@@ -254,3 +254,26 @@ export default function ChatRoom() {
     </div>
   );
 }
+
+function SignedImage({ path }: { path: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    // Backwards compat: if a full URL was stored before, use it directly
+    if (/^https?:\/\//i.test(path)) {
+      setUrl(path);
+      return;
+    }
+    supabase.storage
+      .from("messages")
+      .createSignedUrl(path, 60 * 60)
+      .then(({ data }) => {
+        if (!cancelled && data?.signedUrl) setUrl(data.signedUrl);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+  if (!url) return <div className="w-[240px] h-[160px] bg-muted animate-pulse rounded-xl" />;
+  return <img src={url} alt="" className="rounded-xl max-w-[240px]" />;
+}
