@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useCall } from "@/context/CallContext";
 import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ImagePlus, Send } from "lucide-react";
+import { ArrowLeft, ImagePlus, Phone, Send } from "lucide-react";
 import { formatTime, isOnline } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ type Msg = {
 export default function ChatRoom() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { start: startCall } = useCall();
   const nav = useNavigate();
   const [other, setOther] = useState<any>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
@@ -31,7 +33,6 @@ export default function ChatRoom() {
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // load conv + other user + messages
   useEffect(() => {
     if (!id || !user) return;
     (async () => {
@@ -60,7 +61,6 @@ export default function ChatRoom() {
         .order("created_at", { ascending: true });
       setMsgs((messages as Msg[]) ?? []);
 
-      // mark inbound as read
       await supabase
         .from("messages")
         .update({ read_at: new Date().toISOString() })
@@ -70,7 +70,6 @@ export default function ChatRoom() {
     })();
   }, [id, user, nav]);
 
-  // realtime
   useEffect(() => {
     if (!id || !user) return;
     const ch = supabase
@@ -105,7 +104,6 @@ export default function ChatRoom() {
     };
   }, [id, user, other?.id]);
 
-  // autoscroll bottom
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs]);
@@ -150,7 +148,6 @@ export default function ChatRoom() {
       toast.error(upErr.message);
       return;
     }
-    // Store storage path; signed URLs are generated on render
     const { data } = await supabase
       .from("messages")
       .insert({ conversation_id: id, sender_id: user.id, image_url: path })
@@ -167,22 +164,34 @@ export default function ChatRoom() {
     }
   };
 
+  const callPeer = () => {
+    if (!other || !id) return;
+    startCall({ id: other.id, username: other.username, avatar_url: other.avatar_url }, id);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background">
-      <header className="glass safe-top border-b border-border/40">
-        <div className="flex items-center gap-3 px-2 h-14">
-          <button onClick={() => nav("/chat")} className="p-2 text-foreground">
+      <header className="surface hairline-b safe-top">
+        <div className="flex items-center gap-2 px-2 h-14 max-w-md mx-auto">
+          <button onClick={() => nav("/chat")} className="p-2 text-foreground" aria-label="Späť">
             <ArrowLeft className="w-5 h-5" />
           </button>
           {other && (
             <>
-              <Avatar src={other.avatar_url} alt={other.username} size={36} online={isOnline(other.last_seen)} />
+              <Avatar src={other.avatar_url} alt={other.username} size={34} online={isOnline(other.last_seen)} />
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate">{other.username}</p>
+                <p className="font-medium text-sm truncate">{other.username}</p>
                 <p className="text-[11px] text-muted-foreground">
                   {isOnline(other.last_seen) ? "online" : "offline"}
                 </p>
               </div>
+              <button
+                onClick={callPeer}
+                className="p-2 text-foreground hover:bg-secondary rounded-md transition-colors"
+                aria-label="Zavolať"
+              >
+                <Phone className="w-5 h-5" strokeWidth={1.75} />
+              </button>
             </>
           )}
         </div>
@@ -203,20 +212,18 @@ export default function ChatRoom() {
                 <div
                   className={cn(
                     "max-w-[75%] rounded-2xl overflow-hidden animate-scale-in",
-                    m.image_url ? "p-1" : "px-4 py-2.5 text-sm",
-                    mine ? "bubble-sent text-primary-foreground rounded-br-sm" : "bg-secondary text-foreground rounded-bl-sm",
+                    m.image_url ? "p-1" : "px-3.5 py-2 text-sm",
+                    mine
+                      ? "bg-foreground text-background rounded-br-sm"
+                      : "bg-secondary text-foreground rounded-bl-sm",
                   )}
                 >
-                  {m.image_url ? (
-                    <SignedImage path={m.image_url} />
-                  ) : (
-                    m.content
-                  )}
+                  {m.image_url ? <SignedImage path={m.image_url} /> : m.content}
                 </div>
               </div>
               {isLastMine && (
                 <p className="text-[10px] text-muted-foreground text-right pr-1">
-                  {m.read_at ? "✓✓ Prečítané" : "✓ Odoslané"}
+                  {m.read_at ? "Prečítané" : "Odoslané"}
                 </p>
               )}
             </div>
@@ -224,13 +231,13 @@ export default function ChatRoom() {
         })}
       </div>
 
-      <div className="p-2 border-t border-border/40 safe-bottom flex items-center gap-2">
+      <div className="p-2 hairline-t safe-bottom flex items-center gap-2">
         <input ref={fileRef} type="file" accept="image/*" onChange={sendPhoto} className="hidden" />
         <Button
           variant="ghost"
           size="icon"
           onClick={() => fileRef.current?.click()}
-          className="text-primary"
+          aria-label="Pridať fotku"
         >
           <ImagePlus className="w-5 h-5" />
         </Button>
@@ -242,12 +249,7 @@ export default function ChatRoom() {
           maxLength={2000}
           className="flex-1 rounded-full bg-secondary border-0 h-10"
         />
-        <Button
-          size="icon"
-          onClick={send}
-          disabled={sending || !text.trim()}
-          className="gradient-brand text-primary-foreground rounded-full"
-        >
+        <Button size="icon" onClick={send} disabled={sending || !text.trim()} className="rounded-full">
           <Send className="w-4 h-4" />
         </Button>
       </div>
@@ -259,7 +261,6 @@ function SignedImage({ path }: { path: string }) {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
-    // Backwards compat: if a full URL was stored before, use it directly
     if (/^https?:\/\//i.test(path)) {
       setUrl(path);
       return;
