@@ -313,7 +313,7 @@ export function CallProvider({ children }: { children: ReactNode }) {
         .limit(1)
         .maybeSingle();
       if (cancelled) return;
-      if (data) setIncomingOffer(data.payload as RTCSessionDescriptionInit);
+      if (data) setIncomingOffer(data.payload as unknown as RTCSessionDescriptionInit);
     })();
     return () => {
       cancelled = true;
@@ -353,7 +353,7 @@ export function CallProvider({ children }: { children: ReactNode }) {
           .order("created_at", { ascending: true })
           .limit(1)
           .maybeSingle();
-        if (data) offer = data.payload as RTCSessionDescriptionInit;
+        if (data) offer = data.payload as unknown as RTCSessionDescriptionInit;
         if (!offer) await new Promise((r) => setTimeout(r, 200));
       }
     }
