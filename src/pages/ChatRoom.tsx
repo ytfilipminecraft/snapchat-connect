@@ -150,10 +150,10 @@ export default function ChatRoom() {
       toast.error(upErr.message);
       return;
     }
-    const url = supabase.storage.from("messages").getPublicUrl(path).data.publicUrl;
+    // Store storage path; signed URLs are generated on render
     const { data } = await supabase
       .from("messages")
-      .insert({ conversation_id: id, sender_id: user.id, image_url: url })
+      .insert({ conversation_id: id, sender_id: user.id, image_url: path })
       .select("*")
       .single();
     if (data) setMsgs((p) => (p.some((x) => x.id === (data as any).id) ? p : [...p, data as Msg]));
