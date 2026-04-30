@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const nav = useNavigate();
@@ -22,44 +22,34 @@ export default function Login() {
       toast.error(error.message);
       return;
     }
-    toast.success("Vitaj späť!");
     nav("/", { replace: true });
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 gradient-brand-soft opacity-50 pointer-events-none" />
-      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/30 blur-[120px]" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-primary-glow/30 blur-[120px]" />
-
-      <div className="relative w-full max-w-sm space-y-8 animate-fade-in">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl gradient-brand shadow-brand mb-2">
-            <Sparkles className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight">
-            Vitaj v <span className="gradient-text">PulseChat</span>
-          </h1>
-          <p className="text-muted-foreground">Prihlás sa a pokračuj v rozhovore.</p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background">
+      <div className="w-full max-w-sm space-y-10">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-semibold tracking-tight">PulseChat</h1>
+          <p className="text-sm text-muted-foreground">Prihlás sa do svojho účtu.</p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4 glass rounded-3xl p-6">
-          <div className="space-y-2">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ty@email.sk" />
+            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ty@email.sk" autoCapitalize="none" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="password">Heslo</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
           </div>
-          <Button type="submit" disabled={loading} className="w-full gradient-brand text-primary-foreground hover:opacity-90 shadow-brand h-12 text-base font-semibold">
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Prihlásiť sa"}
+          <Button type="submit" disabled={loading} className="w-full h-11">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Prihlásiť sa"}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
           Nemáš účet?{" "}
-          <Link to="/auth/register" className="text-primary font-semibold hover:underline">
+          <Link to="/auth/register" className="text-foreground font-medium underline-offset-4 hover:underline">
             Zaregistruj sa
           </Link>
         </p>

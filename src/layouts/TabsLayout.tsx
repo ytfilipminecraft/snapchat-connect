@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { Home, Search, PlusSquare, MessageCircle, User } from "lucide-react";
+import { Home, Search, Plus, MessageCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 const tabs = [
   { to: "/", icon: Home, label: "Feed" },
   { to: "/search", icon: Search, label: "Hľadať" },
-  { to: "/create", icon: PlusSquare, label: "Pridať", center: true },
+  { to: "/create", icon: Plus, label: "Pridať" },
   { to: "/chat", icon: MessageCircle, label: "Chat" },
   { to: "/profile", icon: User, label: "Profil" },
 ];
@@ -22,7 +22,6 @@ export default function TabsLayout() {
   useEffect(() => {
     if (!user) return;
     const refresh = async () => {
-      // unread messages: messages where I'm in conversation and not sender and read_at null
       const { data: convs } = await supabase
         .from("conversations")
         .select("id")
@@ -50,7 +49,11 @@ export default function TabsLayout() {
     const ch = supabase
       .channel("badge-watch")
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, refresh)
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, refresh)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        refresh,
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
@@ -59,54 +62,36 @@ export default function TabsLayout() {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-16">
         <Outlet />
       </main>
 
-      <nav
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-40 glass border-t border-border/60 safe-bottom",
-        )}
-      >
+      <nav className="fixed bottom-0 left-0 right-0 z-40 surface hairline-t safe-bottom">
         <div className="grid grid-cols-5 max-w-md mx-auto">
-          {tabs.map(({ to, icon: Icon, label, center }) => {
+          {tabs.map(({ to, icon: Icon, label }) => {
             const active = loc.pathname === to || (to !== "/" && loc.pathname.startsWith(to));
-            const badge =
-              to === "/chat" ? unreadMsgs : to === "/profile" ? unreadNotif : 0;
+            const badge = to === "/chat" ? unreadMsgs : to === "/profile" ? unreadNotif : 0;
             return (
               <NavLink
                 key={to}
                 to={to}
-                className={cn(
-                  "relative flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors",
-                  center && "scale-110",
-                )}
+                className="relative flex flex-col items-center justify-center py-2.5 transition-colors"
+                aria-label={label}
               >
-                <div
-                  className={cn(
-                    "relative p-2 rounded-2xl transition-all",
-                    center && active && "gradient-brand shadow-brand",
-                    center && !active && "gradient-brand-soft",
-                    !center && active && "text-primary",
-                    !center && !active && "text-muted-foreground",
-                  )}
-                >
-                  <Icon className={cn("w-6 h-6", center && "text-primary-foreground")} strokeWidth={active ? 2.5 : 2} />
+                <div className="relative p-1">
+                  <Icon
+                    className={cn(
+                      "w-6 h-6 transition-colors",
+                      active ? "text-foreground" : "text-muted-foreground",
+                    )}
+                    strokeWidth={active ? 2.25 : 1.75}
+                  />
                   {badge > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-semibold flex items-center justify-center">
                       {badge > 99 ? "99+" : badge}
                     </span>
                   )}
                 </div>
-                <span
-                  className={cn(
-                    "text-[10px] font-medium",
-                    active ? "text-foreground" : "text-muted-foreground",
-                    center && "sr-only",
-                  )}
-                >
-                  {label}
-                </span>
               </NavLink>
             );
           })}

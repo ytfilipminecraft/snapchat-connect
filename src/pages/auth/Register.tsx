@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -47,49 +47,53 @@ export default function Register() {
       toast.error(error.message);
       return;
     }
-    toast.success("Účet vytvorený! Vitaj v PulseChat 🎉");
+    toast.success("Účet vytvorený");
     nav("/", { replace: true });
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
-      <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/30 blur-[120px]" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-primary-glow/30 blur-[120px]" />
-
-      <div className="relative w-full max-w-sm space-y-6 animate-fade-in">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl gradient-brand shadow-brand mb-2">
-            <Sparkles className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Pridaj sa k <span className="gradient-text">PulseChat</span></h1>
-          <p className="text-muted-foreground text-sm">Zadarmo. Bez reklám. Pre teba a tvoju partiu.</p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background">
+      <div className="w-full max-w-sm space-y-8">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-semibold tracking-tight">Vytvor si účet</h1>
+          <p className="text-sm text-muted-foreground">Bez reklám. Pre teba a tvoju partiu.</p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4 glass rounded-3xl p-6">
-          <div className="space-y-2">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-1.5">
             <Label htmlFor="full_name">Meno</Label>
             <Input id="full_name" required value={form.full_name} onChange={update("full_name")} placeholder="Tvoje meno" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="username">Používateľské meno</Label>
-            <Input id="username" required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })} placeholder="napr. lucia_22" autoCapitalize="none" autoCorrect="off" />
+            <Input
+              id="username"
+              required
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })}
+              placeholder="napr. lucia_22"
+              autoCapitalize="none"
+              autoCorrect="off"
+            />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={form.email} onChange={update("email")} placeholder="ty@email.sk" />
+            <Input id="email" type="email" required value={form.email} onChange={update("email")} placeholder="ty@email.sk" autoCapitalize="none" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="password">Heslo</Label>
             <Input id="password" type="password" required value={form.password} onChange={update("password")} placeholder="Min. 8 znakov" />
           </div>
-          <Button type="submit" disabled={loading} className="w-full gradient-brand text-primary-foreground hover:opacity-90 shadow-brand h-12 text-base font-semibold">
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Vytvoriť účet"}
+          <Button type="submit" disabled={loading} className="w-full h-11">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Vytvoriť účet"}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
           Už máš účet?{" "}
-          <Link to="/auth/login" className="text-primary font-semibold hover:underline">Prihlás sa</Link>
+          <Link to="/auth/login" className="text-foreground font-medium underline-offset-4 hover:underline">
+            Prihlás sa
+          </Link>
         </p>
       </div>
     </div>
