@@ -152,7 +152,7 @@ export function PostCard({ post, onChange }: { post: FeedPost; onChange?: () => 
 
       {/* Counts */}
       <div className="px-4 pt-2 space-y-1">
-        <p className="text-sm font-semibold">{count} {count === 1 ? "lajk" : count < 5 ? "lajky" : "lajkov"}</p>
+        <p className="text-sm font-medium">{count} {count === 1 ? "lajk" : count < 5 ? "lajky" : "lajkov"}</p>
         {post.caption && (
           <p className="text-sm">
             <Link to={`/u/${post.profile.username}`} className="font-semibold mr-2">{post.profile.username}</Link>
@@ -282,7 +282,7 @@ function CommentsSheet({
             maxLength={500}
             onKeyDown={(e) => e.key === "Enter" && submit()}
           />
-          <Button onClick={submit} disabled={loading || !text.trim()} size="icon" className="gradient-brand text-primary-foreground">
+          <Button onClick={submit} disabled={loading || !text.trim()} size="icon">
             <Send className="w-4 h-4" />
           </Button>
         </div>
