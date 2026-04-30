@@ -134,8 +134,8 @@ export default function CreatePost() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="sticky top-0 z-30 glass safe-top">
-        <div className="flex items-center justify-between px-2 h-14">
+      <header className="sticky top-0 z-30 surface hairline-b safe-top">
+        <div className="flex items-center justify-between px-2 h-14 max-w-md mx-auto">
           <button
             onClick={() => {
               if (step === "pick") nav(-1);
@@ -144,21 +144,22 @@ export default function CreatePost() {
               else setStep("filter");
             }}
             className="p-2 text-foreground"
+            aria-label="Späť"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold">
+          <h1 className="font-medium text-base">
             {step === "pick" && "Nový príspevok"}
             {step === "crop" && "Orežte"}
             {step === "filter" && "Filter"}
             {step === "caption" && "Popis"}
           </h1>
           {step === "crop" && croppedAreaPixels ? (
-            <button onClick={goFilter} className="px-3 py-1.5 text-sm font-semibold text-primary">Ďalej</button>
+            <button onClick={goFilter} className="px-3 py-1.5 text-sm font-medium text-foreground">Ďalej</button>
           ) : step === "filter" ? (
-            <button onClick={() => setStep("caption")} className="px-3 py-1.5 text-sm font-semibold text-primary">Ďalej</button>
+            <button onClick={() => setStep("caption")} className="px-3 py-1.5 text-sm font-medium text-foreground">Ďalej</button>
           ) : step === "caption" ? (
-            <button onClick={submit} disabled={submitting} className="px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-50">
+            <button onClick={submit} disabled={submitting} className="px-3 py-1.5 text-sm font-medium text-foreground disabled:opacity-50">
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Zdieľať"}
             </button>
           ) : (
@@ -169,13 +170,13 @@ export default function CreatePost() {
 
       {step === "pick" && (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <div className="w-24 h-24 rounded-3xl gradient-brand-soft flex items-center justify-center mb-4">
-            <ImagePlus className="w-12 h-12 text-primary" />
+          <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+            <ImagePlus className="w-7 h-7 text-foreground" strokeWidth={1.5} />
           </div>
-          <h2 className="text-lg font-bold mb-2">Vyber fotku</h2>
+          <h2 className="text-base font-medium mb-1">Vyber fotku</h2>
           <p className="text-sm text-muted-foreground mb-6">Z galérie alebo fotoaparátu.</p>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onPick} className="hidden" />
-          <Button onClick={() => fileRef.current?.click()} className="gradient-brand text-primary-foreground shadow-brand h-12 px-8 rounded-full">
+          <Button onClick={() => fileRef.current?.click()} className="h-11 px-6">
             Vybrať fotku
           </Button>
         </div>
@@ -212,13 +213,13 @@ export default function CreatePost() {
               >
                 <div
                   className={cn(
-                    "w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors",
-                    filter.key === f.key ? "border-primary shadow-glow" : "border-transparent",
+                    "w-16 h-16 rounded-md overflow-hidden border-2 transition-colors",
+                    filter.key === f.key ? "border-foreground" : "border-transparent",
                   )}
                 >
                   <img src={croppedDataUrl} alt={f.label} style={{ filter: f.css || "none" }} className="w-full h-full object-cover" />
                 </div>
-                <span className={cn("text-xs", filter.key === f.key ? "text-primary font-semibold" : "text-muted-foreground")}>
+                <span className={cn("text-xs", filter.key === f.key ? "text-foreground font-medium" : "text-muted-foreground")}>
                   {f.label}
                 </span>
               </button>

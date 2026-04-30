@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar } from "@/components/Avatar";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Grid3x3, LogOut, MoreHorizontal, Settings } from "lucide-react";
+import { ArrowLeft, Grid3x3, LogOut, MoreHorizontal, Settings, Shield } from "lucide-react";
 import { ReportDialog } from "@/components/ReportDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
@@ -18,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function Profile({ self = false }: { self?: boolean }) {
   const { username } = useParams<{ username: string }>();
-  const { user, profile: myProfile, signOut } = useAuth();
+  const { user, profile: myProfile, isAdmin, signOut } = useAuth();
   const nav = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -105,19 +107,31 @@ export default function Profile({ self = false }: { self?: boolean }) {
 
   return (
     <div>
-      <header className="sticky top-0 z-30 glass safe-top">
-        <div className="flex items-center justify-between px-2 h-14">
+      <header className="sticky top-0 z-30 surface hairline-b safe-top">
+        <div className="flex items-center justify-between px-2 h-14 max-w-md mx-auto">
           {!self ? (
-            <button onClick={() => nav(-1)} className="p-2"><ArrowLeft className="w-5 h-5" /></button>
-          ) : <span className="w-10" />}
-          <h1 className="font-semibold flex items-center gap-1">
+            <button onClick={() => nav(-1)} className="p-2" aria-label="Späť">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          ) : (
+            <ThemeToggle />
+          )}
+          <h1 className="font-medium flex items-center gap-1 text-base">
             {profile.username} {profile.is_verified && <VerifiedBadge />}
           </h1>
           {isMe ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="p-2"><Settings className="w-5 h-5" /></DropdownMenuTrigger>
+              <DropdownMenuTrigger className="p-2" aria-label="Nastavenia">
+                <Settings className="w-5 h-5" />
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => nav("/profile/edit")}>Upraviť profil</DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => nav("/admin")}>
+                    <Shield className="w-4 h-4 mr-2" /> Admin panel
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut().then(() => nav("/auth/login"))} className="text-destructive">
                   <LogOut className="w-4 h-4 mr-2" /> Odhlásiť sa
                 </DropdownMenuItem>
@@ -125,7 +139,9 @@ export default function Profile({ self = false }: { self?: boolean }) {
             </DropdownMenu>
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger className="p-2"><MoreHorizontal className="w-5 h-5" /></DropdownMenuTrigger>
+              <DropdownMenuTrigger className="p-2" aria-label="Viac">
+                <MoreHorizontal className="w-5 h-5" />
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setReportOpen(true)} className="text-destructive">Nahlásiť</DropdownMenuItem>
               </DropdownMenuContent>
@@ -139,10 +155,11 @@ export default function Profile({ self = false }: { self?: boolean }) {
           <button
             onClick={() => isMe && fileRef.current?.click()}
             className={cn("relative", isMe && "cursor-pointer")}
+            aria-label={isMe ? "Zmeniť avatar" : profile.username}
           >
-            <Avatar src={profile.avatar_url} alt={profile.username} size={96} ring />
+            <Avatar src={profile.avatar_url} alt={profile.username} size={88} />
             {isMe && (
-              <span className="absolute bottom-0 right-0 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-foreground text-background text-xs font-semibold flex items-center justify-center border-2 border-background">
                 +
               </span>
             )}
@@ -156,31 +173,33 @@ export default function Profile({ self = false }: { self?: boolean }) {
         </div>
 
         <div className="mt-4">
-          {profile.full_name && <p className="font-semibold text-sm">{profile.full_name}</p>}
-          {profile.bio && <p className="text-sm whitespace-pre-line mt-1">{profile.bio}</p>}
+          {profile.full_name && <p className="font-medium text-sm">{profile.full_name}</p>}
+          {profile.bio && <p className="text-sm whitespace-pre-line mt-1 text-muted-foreground">{profile.bio}</p>}
         </div>
 
         <div className="mt-4 flex gap-2">
           {isMe ? (
-            <Button onClick={() => nav("/profile/edit")} className="flex-1" variant="secondary">Upraviť profil</Button>
+            <Button onClick={() => nav("/profile/edit")} className="flex-1" variant="outline">
+              Upraviť profil
+            </Button>
           ) : (
             <>
               <Button
                 onClick={toggleFollow}
-                className={cn("flex-1", !iFollow && "gradient-brand text-primary-foreground")}
-                variant={iFollow ? "secondary" : "default"}
+                className="flex-1"
+                variant={iFollow ? "outline" : "default"}
               >
                 {iFollow ? "Sledujem" : "Sledovať"}
               </Button>
-              <Button onClick={startChat} variant="secondary" className="flex-1">Správa</Button>
+              <Button onClick={startChat} variant="outline" className="flex-1">Správa</Button>
             </>
           )}
         </div>
       </div>
 
-      <div className="border-t border-border/40 mt-2">
-        <div className="flex items-center justify-center py-3 text-primary">
-          <Grid3x3 className="w-5 h-5" />
+      <div className="hairline-t mt-2">
+        <div className="flex items-center justify-center py-3 text-foreground">
+          <Grid3x3 className="w-5 h-5" strokeWidth={1.75} />
         </div>
         {posts.length === 0 ? (
           <p className="text-center text-muted-foreground py-12 text-sm">Zatiaľ žiadne príspevky.</p>
@@ -208,7 +227,7 @@ export default function Profile({ self = false }: { self?: boolean }) {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <p className="font-bold text-base">{value}</p>
+      <p className="font-semibold text-base">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
