@@ -15,6 +15,7 @@ type AuthCtx = {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
+  isAdmin: boolean;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -25,30 +26,33 @@ const Ctx = createContext<AuthCtx | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadProfile = async (uid: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, username, full_name, bio, avatar_url, is_verified")
-      .eq("id", uid)
-      .maybeSingle();
-    setProfile((data as Profile) ?? null);
+    const [{ data: prof }, { data: roles }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, username, full_name, bio, avatar_url, is_verified")
+        .eq("id", uid)
+        .maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+    ]);
+    setProfile((prof as Profile) ?? null);
+    setIsAdmin(!!roles?.some((r: { role: string }) => r.role === "admin"));
   };
 
   useEffect(() => {
-    // Set listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       if (sess?.user) {
-        // defer to avoid deadlock
         setTimeout(() => loadProfile(sess.user.id), 0);
       } else {
         setProfile(null);
+        setIsAdmin(false);
       }
     });
 
-    // Then check existing
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       if (s?.user) loadProfile(s.user.id).finally(() => setLoading(false));
@@ -58,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  // presence: bump last_seen periodically while logged in
   useEffect(() => {
     if (!session?.user) return;
     const ping = () =>
@@ -77,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session,
     user: session?.user ?? null,
     profile,
+    isAdmin,
     loading,
     refreshProfile: async () => {
       if (session?.user) await loadProfile(session.user.id);

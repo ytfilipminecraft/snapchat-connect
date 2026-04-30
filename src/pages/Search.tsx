@@ -41,31 +41,31 @@ export default function Search() {
 
   return (
     <div>
-      <header className="sticky top-0 z-30 glass safe-top px-4 py-3">
+      <header className="sticky top-0 z-30 surface hairline-b safe-top px-4 py-3">
         <div className="relative max-w-md mx-auto">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Vyhľadaj používateľa…"
-            className="pl-9 h-11 rounded-full bg-secondary border-0"
+            placeholder="Hľadaj používateľa…"
+            className="pl-9 h-10"
           />
         </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 py-4">
-        {!q.trim() && <h2 className="text-sm font-semibold text-muted-foreground mb-3">Objav nových ľudí</h2>}
-        <div className="space-y-2">
+        {!q.trim() && <h2 className="text-xs uppercase tracking-wide font-medium text-muted-foreground mb-3">Objav nových ľudí</h2>}
+        <div className="space-y-1">
           {list.map((u) => (
             <Link
               key={u.id}
               to={`/u/${u.username}`}
-              className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary transition-colors"
+              className="flex items-center gap-3 p-2 rounded-md hover:bg-secondary transition-colors"
             >
-              <Avatar src={u.avatar_url} alt={u.username} size={48} />
+              <Avatar src={u.avatar_url} alt={u.username} size={44} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <span className="font-semibold text-sm truncate">{u.username}</span>
+                  <span className="font-medium text-sm truncate">{u.username}</span>
                   {u.is_verified && <VerifiedBadge />}
                 </div>
                 {u.full_name && <p className="text-xs text-muted-foreground truncate">{u.full_name}</p>}

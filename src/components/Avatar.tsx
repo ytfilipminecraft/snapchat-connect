@@ -20,23 +20,21 @@ export function Avatar({
     <div className={cn("relative inline-block", className)} style={{ width: size, height: size }}>
       <div
         className={cn(
-          "rounded-full overflow-hidden flex items-center justify-center bg-secondary text-foreground font-bold",
-          ring && "p-[2px] ring-story",
+          "rounded-full overflow-hidden flex items-center justify-center bg-secondary text-foreground font-semibold",
+          ring && "ring-1 ring-border",
         )}
         style={{ width: size, height: size, fontSize: size * 0.4 }}
       >
         {src ? (
-          <img src={src} alt={alt ?? ""} className={cn("w-full h-full object-cover", ring && "rounded-full bg-background p-[2px]")} />
+          <img src={src} alt={alt ?? ""} className="w-full h-full object-cover" />
         ) : (
-          <span className={cn(ring && "rounded-full bg-secondary w-full h-full flex items-center justify-center")}>
-            {initial}
-          </span>
+          <span>{initial}</span>
         )}
       </div>
       {online && (
         <span
           className="absolute bottom-0 right-0 block rounded-full bg-success border-2 border-background"
-          style={{ width: size * 0.28, height: size * 0.28 }}
+          style={{ width: Math.max(8, size * 0.26), height: Math.max(8, size * 0.26) }}
         />
       )}
     </div>

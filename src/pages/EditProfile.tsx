@@ -32,11 +32,19 @@ export default function EditProfile() {
 
   return (
     <div>
-      <header className="sticky top-0 z-30 glass safe-top">
-        <div className="flex items-center justify-between px-2 h-14">
-          <button onClick={() => nav(-1)} className="p-2"><ArrowLeft className="w-5 h-5" /></button>
-          <h1 className="font-semibold">Upraviť profil</h1>
-          <button onClick={save} disabled={saving} className="px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-50">Uložiť</button>
+      <header className="sticky top-0 z-30 surface hairline-b safe-top">
+        <div className="flex items-center justify-between px-2 h-14 max-w-md mx-auto">
+          <button onClick={() => nav(-1)} className="p-2" aria-label="Späť">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="font-medium text-base">Upraviť profil</h1>
+          <button
+            onClick={save}
+            disabled={saving}
+            className="px-3 py-1.5 text-sm font-medium text-foreground disabled:opacity-50"
+          >
+            Uložiť
+          </button>
         </div>
       </header>
 
@@ -50,7 +58,9 @@ export default function EditProfile() {
           <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={200} className="mt-1.5 min-h-24" />
           <p className="text-xs text-muted-foreground text-right mt-1">{bio.length}/200</p>
         </div>
-        <Button onClick={save} disabled={saving} className="w-full gradient-brand text-primary-foreground">Uložiť</Button>
+        <Button onClick={save} disabled={saving} className="w-full">
+          Uložiť
+        </Button>
       </div>
     </div>
   );

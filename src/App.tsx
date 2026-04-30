@@ -4,7 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { CallProvider } from "@/context/CallContext";
+import { CallOverlay } from "@/components/CallOverlay";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/AdminRoute";
 import TabsLayout from "@/layouts/TabsLayout";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
@@ -16,6 +20,7 @@ import ChatRoom from "@/pages/ChatRoom";
 import Profile from "@/pages/Profile";
 import EditProfile from "@/pages/EditProfile";
 import Notifications from "@/pages/Notifications";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,33 +34,39 @@ function AuthRedirect({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-center" />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth/login" element={<AuthRedirect><Login /></AuthRedirect>} />
-            <Route path="/auth/register" element={<AuthRedirect><Register /></AuthRedirect>} />
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner position="top-center" />
+        <BrowserRouter>
+          <AuthProvider>
+            <CallProvider>
+              <Routes>
+                <Route path="/auth/login" element={<AuthRedirect><Login /></AuthRedirect>} />
+                <Route path="/auth/register" element={<AuthRedirect><Register /></AuthRedirect>} />
 
-            <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
-            <Route path="/chat/:id" element={<ProtectedRoute><ChatRoom /></ProtectedRoute>} />
-            <Route path="/u/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+                <Route path="/chat/:id" element={<ProtectedRoute><ChatRoom /></ProtectedRoute>} />
+                <Route path="/u/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
 
-            <Route element={<ProtectedRoute><TabsLayout /></ProtectedRoute>}>
-              <Route path="/" element={<Feed />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/chat" element={<ChatList />} />
-              <Route path="/profile" element={<Profile self />} />
-            </Route>
+                <Route element={<ProtectedRoute><TabsLayout /></ProtectedRoute>}>
+                  <Route path="/" element={<Feed />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/chat" element={<ChatList />} />
+                  <Route path="/profile" element={<Profile self />} />
+                </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <CallOverlay />
+            </CallProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

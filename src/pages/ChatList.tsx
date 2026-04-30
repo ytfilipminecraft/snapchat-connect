@@ -78,37 +78,37 @@ export default function ChatList() {
 
   return (
     <div>
-      <header className="sticky top-0 z-30 glass safe-top px-4 h-14 flex items-center">
-        <h1 className="text-xl font-bold">Správy</h1>
+      <header className="sticky top-0 z-30 surface hairline-b safe-top">
+        <div className="px-4 h-14 flex items-center max-w-md mx-auto">
+          <h1 className="text-xl font-semibold tracking-tight">Správy</h1>
+        </div>
       </header>
 
       <div className="max-w-md mx-auto">
         {loading && <p className="text-center py-12 text-muted-foreground text-sm">Načítavam…</p>}
         {!loading && rows.length === 0 && (
           <div className="text-center py-20 px-6">
-            <div className="w-20 h-20 mx-auto rounded-3xl gradient-brand-soft flex items-center justify-center mb-4">
-              <MessageCircle className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="font-bold mb-2">Žiadne správy</h2>
+            <MessageCircle className="w-10 h-10 mx-auto mb-4 text-muted-foreground" strokeWidth={1.5} />
+            <h2 className="text-base font-medium mb-1">Žiadne správy</h2>
             <p className="text-sm text-muted-foreground">Nájdi niekoho v Hľadať a začni rozhovor.</p>
           </div>
         )}
         {rows.map((r) => {
           const lastText = r.last
             ? r.last.image_url
-              ? "📷 Fotka"
+              ? "Fotka"
               : r.last.content ?? ""
             : "Začni konverzáciu";
           return (
             <Link
               key={r.id}
               to={`/chat/${r.id}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors"
             >
-              <Avatar src={r.other.avatar_url} alt={r.other.username} size={56} online={isOnline(r.other.last_seen)} />
+              <Avatar src={r.other.avatar_url} alt={r.other.username} size={52} online={isOnline(r.other.last_seen)} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-semibold text-sm truncate">{r.other.username}</span>
+                  <span className="font-medium text-sm truncate">{r.other.username}</span>
                   {r.last && (
                     <span className="text-xs text-muted-foreground flex-shrink-0">{timeAgo(r.last.created_at)}</span>
                   )}
@@ -122,7 +122,7 @@ export default function ChatList() {
                     {lastText}
                   </p>
                   {r.unread > 0 && (
-                    <span className="min-w-[20px] h-5 px-1.5 rounded-full gradient-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-foreground text-background text-[10px] font-semibold flex items-center justify-center">
                       {r.unread}
                     </span>
                   )}
