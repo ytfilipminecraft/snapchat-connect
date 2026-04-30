@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { PostCard, FeedPost } from "@/components/PostCard";
 import { PostSkeleton } from "@/components/Skeletons";
-import { Bell, Sparkles } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const PAGE = 8;
