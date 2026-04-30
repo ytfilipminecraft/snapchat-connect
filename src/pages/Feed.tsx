@@ -132,23 +132,17 @@ export default function Feed() {
 
   return (
     <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      {/* Header */}
-      <header className="sticky top-0 z-30 glass safe-top">
-        <div className="flex items-center justify-between px-4 h-14">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl gradient-brand flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight gradient-text">PulseChat</h1>
-          </div>
+      <header className="sticky top-0 z-30 surface hairline-b safe-top">
+        <div className="flex items-center justify-between px-4 h-14 max-w-md mx-auto">
+          <h1 className="text-xl font-semibold tracking-tight">PulseChat</h1>
           <button
             onClick={() => nav("/notifications")}
             className="relative p-2 -mr-2 text-foreground"
             aria-label="Notifikácie"
           >
-            <Bell className="w-6 h-6" />
+            <Bell className="w-5 h-5" />
             {unreadNotif > 0 && (
-              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center">
                 {unreadNotif > 9 ? "9+" : unreadNotif}
               </span>
             )}
@@ -161,7 +155,7 @@ export default function Feed() {
           {pull > 70 ? "Pusti pre obnovenie" : "Potiahni nadol…"}
         </div>
       )}
-      {refreshing && <div className="text-center py-2 text-xs text-primary">Obnovujem…</div>}
+      {refreshing && <div className="text-center py-2 text-xs text-muted-foreground">Obnovujem…</div>}
 
       <div className="max-w-md mx-auto">
         {loading && (
@@ -173,12 +167,12 @@ export default function Feed() {
 
         {!loading && posts.length === 0 && (
           <div className="text-center py-20 px-6">
-            <div className="w-20 h-20 mx-auto rounded-3xl gradient-brand-soft flex items-center justify-center mb-4">
-              <Sparkles className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="text-lg font-bold mb-2">Tvoj feed je zatiaľ prázdny</h2>
-            <p className="text-muted-foreground text-sm mb-4">Začni sledovať ľudí alebo pridaj prvý príspevok.</p>
-            <Link to="/search" className="inline-block px-6 py-2.5 rounded-full gradient-brand text-primary-foreground font-semibold shadow-brand">
+            <h2 className="text-base font-medium mb-2">Tvoj feed je zatiaľ prázdny</h2>
+            <p className="text-muted-foreground text-sm mb-6">Začni sledovať ľudí alebo pridaj prvý príspevok.</p>
+            <Link
+              to="/search"
+              className="inline-block px-5 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
+            >
               Nájsť ľudí
             </Link>
           </div>
