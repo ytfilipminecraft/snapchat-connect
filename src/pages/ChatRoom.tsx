@@ -208,7 +208,7 @@ export default function ChatRoom() {
                   )}
                 >
                   {m.image_url ? (
-                    <img src={m.image_url} alt="" className="rounded-xl max-w-[240px]" />
+                    <SignedImage path={m.image_url} />
                   ) : (
                     m.content
                   )}
