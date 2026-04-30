@@ -164,9 +164,18 @@ export default function ChatRoom() {
     }
   };
 
-  const callPeer = () => {
+  const callPeer = async () => {
     if (!other || !id) return;
-    startCall({ id: other.id, username: other.username, avatar_url: other.avatar_url }, id);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      await startCall(
+        { id: other.id, username: other.username, avatar_url: other.avatar_url },
+        id,
+        stream,
+      );
+    } catch {
+      toast.error("Nepodarilo sa získať prístup k mikrofónu");
+    }
   };
 
   return (

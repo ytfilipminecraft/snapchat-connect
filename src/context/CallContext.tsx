@@ -30,7 +30,7 @@ type CallCtx = {
   callId: string | null;
   startedAt: number | null;
   muted: boolean;
-  start: (peer: Peer, conversationId: string) => Promise<void>;
+  start: (peer: Peer, conversationId: string, stream?: MediaStream) => Promise<void>;
   accept: () => Promise<void>;
   decline: () => Promise<void>;
   hangup: () => Promise<void>;
@@ -182,19 +182,21 @@ export function CallProvider({ children }: { children: ReactNode }) {
 
   // ------------ Start outgoing call ------------
   const start = useCallback(
-    async (p: Peer, conversationId: string) => {
+    async (p: Peer, conversationId: string, stream?: MediaStream) => {
       if (!user) return;
       if (status !== "idle") {
         toast.error("Už prebieha hovor");
         return;
       }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        localStreamRef.current = stream;
-      } catch {
-        toast.error("Nepodarilo sa získať prístup k mikrofónu");
-        return;
+      if (!stream) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        } catch {
+          toast.error("Nepodarilo sa získať prístup k mikrofónu");
+          return;
+        }
       }
+      localStreamRef.current = stream;
 
       const { data: row, error } = await supabase
         .from("calls")
