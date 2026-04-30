@@ -100,13 +100,13 @@ export function PostCard({ post, onChange }: { post: FeedPost; onChange?: () => 
   const isOwner = user?.id === post.user_id;
 
   return (
-    <article className="border-b border-border/40 pb-4 animate-fade-in">
+    <article className="hairline-b pb-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <Link to={`/u/${post.profile.username}`} className="flex items-center gap-3">
-          <Avatar src={post.profile.avatar_url} alt={post.profile.username} size={40} ring />
+          <Avatar src={post.profile.avatar_url} alt={post.profile.username} size={36} />
           <div className="flex items-center gap-1">
-            <span className="font-semibold text-sm">{post.profile.username}</span>
+            <span className="font-medium text-sm">{post.profile.username}</span>
             {post.profile.is_verified && <VerifiedBadge />}
           </div>
         </Link>
@@ -133,17 +133,20 @@ export function PostCard({ post, onChange }: { post: FeedPost; onChange?: () => 
       <div className="relative bg-muted aspect-square w-full overflow-hidden" onDoubleClick={onDoubleTap}>
         <img src={post.image_url} alt={post.caption ?? ""} className="w-full h-full object-cover" loading="lazy" />
         {burst && (
-          <Heart className="absolute top-1/2 left-1/2 w-32 h-32 fill-like text-like animate-heart-burst" style={{ transform: "translate(-50%, -50%)" }} />
+          <Heart
+            className="absolute top-1/2 left-1/2 w-32 h-32 fill-like text-like animate-heart-burst"
+            style={{ transform: "translate(-50%, -50%)" }}
+          />
         )}
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-3 px-4 pt-3">
-        <button onClick={toggleLike} className={cn("transition-transform", liked && "animate-heart-pop")}>
-          <Heart className={cn("w-7 h-7", liked ? "fill-like text-like" : "text-foreground")} />
+        <button onClick={toggleLike} className={cn("transition-transform", liked && "animate-heart-pop")} aria-label="Lajk">
+          <Heart className={cn("w-6 h-6", liked ? "fill-like text-like" : "text-foreground")} strokeWidth={1.75} />
         </button>
-        <button onClick={() => setCommentsOpen(true)} className="text-foreground">
-          <MessageCircle className="w-7 h-7" />
+        <button onClick={() => setCommentsOpen(true)} className="text-foreground" aria-label="Komentáre">
+          <MessageCircle className="w-6 h-6" strokeWidth={1.75} />
         </button>
       </div>
 
